@@ -1,0 +1,26 @@
+package myproject;
+
+import com.pulumi.Pulumi;
+import java.util.*;
+import com.pulumi.*;
+import com.pulumi.core.Output;
+import com.pulumi.oci.ContainerEngine.*;
+import com.pulumi.oci.ContainerEngine.inputs.ClusterEndpointConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.ClusterOptionsArgs;
+import com.pulumi.oci.ContainerEngine.inputs.ClusterOptionsKubernetesNetworkConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeConfigDetailsArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeConfigDetailsPlacementConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeShapeConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeSourceDetailsArgs;
+import com.pulumi.oci.Core.inputs.GetImagesFilter;
+import com.pulumi.oci.Core.outputs.GetShapeFilter;
+
+
+public class App {
+    public static void main(String[] args) {
+        Pulumi.run(App::stack);
+    }
+    private static void stack(Context ctx) {
+	    
+    }
+}    

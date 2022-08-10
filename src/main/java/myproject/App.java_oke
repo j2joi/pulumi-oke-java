@@ -1,0 +1,126 @@
+package myproject;
+
+import com.pulumi.Pulumi;
+import java.util.*;
+import com.pulumi.*;
+import com.pulumi.core.Output;
+import com.pulumi.oci.ContainerEngine.*;
+import com.pulumi.oci.ContainerEngine.inputs.ClusterEndpointConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.ClusterOptionsArgs;
+import com.pulumi.oci.ContainerEngine.inputs.ClusterOptionsKubernetesNetworkConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeConfigDetailsArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeConfigDetailsPlacementConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeShapeConfigArgs;
+import com.pulumi.oci.ContainerEngine.inputs.NodePoolNodeSourceDetailsArgs;
+import com.pulumi.oci.Core.inputs.GetImagesFilter;
+import com.pulumi.oci.Core.outputs.GetShapeFilter;
+
+
+public class App {
+    public static void main(String[] args) {
+        Pulumi.run(App::stack);
+    }
+    private static void stack(Context ctx) {
+            String targetCompartmentId = "ocid1.compartment.oc1..aaaaaaaad34mhyme6neawehq56sndcl5no4q4yqvdcsak5piqpbmq36mreqa";
+            String kubernetesVersion="v1.23.4";
+            List<String> subnetsLbOcid = Arrays.asList("ocid1.subnet.oc1.iad.aaaaaaaan6fXXXXXXXXX","");
+
+            String subnetWorkernodesOcid = "ocid1.subnet.oc1.iad.aaaaaaaakYYYYYYY";
+
+            String subnetEndpointOcid = "ocid1.subnet.oc1.iad.aaaaaaaaxmfZZZZZZZZZ";
+
+            String vcnOcid="ocid1.vcn.oc1.iad.amaaaaaadoggtjaasym4AAAAAAAAAA";
+
+            ClusterEndpointConfigArgs endpointConfig = ClusterEndpointConfigArgs.builder()
+                .isPublicIpEnabled(true)
+                .subnetId(subnetEndpointOcid)
+                .build();
+            
+            ClusterOptionsArgs okeClusterOptsArgs = ClusterOptionsArgs.builder()
+                .kubernetesNetworkConfig(ClusterOptionsKubernetesNetworkConfigArgs.builder()
+                    .podsCidr("10.244.0.0/16")
+                    .servicesCidr("10.96.0.0/16")
+                    .build()
+                )
+                .serviceLbSubnetIds(subnetsLbOcid)
+                .build();
+                
+            com.pulumi.oci.ContainerEngine.Cluster okeCluster = new Cluster("firstOKEJAVA", 
+                ClusterArgs.builder()
+                    .compartmentId(targetCompartmentId)
+                    .kubernetesVersion(kubernetesVersion)
+                    .name("okeByJavaPulumi")
+                    .options(okeClusterOptsArgs)
+                    .endpointConfig(endpointConfig)
+                    .vcnId(vcnOcid)    
+                    .build()
+            );
+            // cluster Created. 
+            ctx.export("Cluster OCID", okeCluster.getId());
+
+            // Get the Availability Domain names for this region
+            
+            // AvailabilityDomains ad;
+            // .AvailabilityDomains adList=com.pulumi.oci.Identity.AvailabilityDomains()
+            //  (targetCompartmentId);
+            // ad=ad_list.availability_domains
+            String availabilityDomain="";
+            // Worker node Compute Instance details
+            int number_worker_nodes=3;
+            double default_node_memory_size=16;
+            double default_node_num_ocpus=1;
+
+            // GetImagesFilter.builder()
+            // .
+            // GetShapeFilter.builder()
+            // .
+
+            // list_of_supported_image =oci.core.get_images(compartment_id=target_compartment_ocid,
+            //     operating_system="Oracle Linux",
+            //     operating_system_version= "7.9",
+            //     shape= "VM.Standard.E3.Flex",
+            //     sort_by="TIMECREATED",
+            //     sort_order="DESC"
+            // )
+            // oke_optimized_image= list_of_supported_image[0].getId
+            String oke_optimized_image_ocid="ocid1.image.oc1.iad.aaaaaaaacich65ocy3fp6uqg66qqjmku7yeqwjz5ojfhvhwxvcwqo44kj2oq";
+
+            NodePoolNodeConfigDetailsPlacementConfigArgs nodePoolPlacementConfigArgs= NodePoolNodeConfigDetailsPlacementConfigArgs.builder()
+            .availabilityDomain(availabilityDomain)
+            .subnetId(subnetWorkernodesOcid)
+            .build();
+
+            
+            NodePoolNodeConfigDetailsArgs nodeConfigDetails=NodePoolNodeConfigDetailsArgs.builder()
+            .placementConfigs(nodePoolPlacementConfigArgs)
+            .size(number_worker_nodes)
+            .build();
+
+            NodePoolNodeShapeConfigArgs nodeShapeConfig = NodePoolNodeShapeConfigArgs.builder()
+            .memoryInGbs(default_node_memory_size)
+            .ocpus(default_node_num_ocpus)
+            .build();
+
+            NodePoolNodeSourceDetailsArgs nodeSourceDetails = NodePoolNodeSourceDetailsArgs.builder()
+            .imageId(oke_optimized_image_ocid)
+            .sourceType("IMAGE")
+            .bootVolumeSizeInGbs("60")
+            .build();
+                        
+            NodePoolArgs nodePoolArgs = NodePoolArgs.builder()
+                .clusterId(okeCluster.getId())
+                .compartmentId(targetCompartmentId)
+                .kubernetesVersion(kubernetesVersion)
+                .nodeShape("VM.Standard.E3.Flex")
+                .name("E3Flex")
+                .nodeConfigDetails(nodeConfigDetails)
+                .nodeShapeConfig(nodeShapeConfig)
+                .nodeSourceDetails(nodeSourceDetails)
+                .build();
+                // .build();
+            
+            NodePool node_pool = new NodePool("nodePool",nodePoolArgs);
+            ctx.export("Pool OCID", node_pool.getId()); 
+    }    
+}
+
