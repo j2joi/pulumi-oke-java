@@ -9,3 +9,15 @@ config:
     secure: v1:driWvSKVglnAoCHt:ImTy0vDpuKMdWoRHE10Ysulu1O5oKc3Nflkt+phBQzFgC3QNQdwrf3EJr2FXSgZP/lcLNPgrJIKRFNQfagAk23RftInBD4hcfT4raiH6q7JiWl/nsNEMFHbfHg7aydY=
   oci:userOcid:
     secure: v1:MqRGxRjJUU4W/dXE:oEXE57TkwB1+JQCDP1uMQ7WOp6oFBY7WddkqxrK2xrlgzQmr1qsYIFFuWPC6jbJ6d5lvPtDI1Y4uUgSX743eQZkDRp8kcD/ah4AkGAp1LstqkDNUz4v0EDDrSGo=
+  oke-mvn:oke:
+    node_version: 1.23.4
+    nodes: 2
+    version: v1.23.4
+    use_oke_images: true
+  oke-mvn:subnet:
+    endpoint: ocid1.subnet.oc1.iad.aaaaaaaaxmfgzncuobrh6hmfljwdx26wixerd32wkf4qhx4rdqtqufc3x7mq
+    # lb:
+      # - ocid1.subnet.oc1.ca-montreal-1.aaaaaaaao3kn7ebpozzqxbzbr5gxiu2lvviwlalibnvp3b3s6rkqhux5umkq 
+    lb: ocid1.subnet.oc1.iad.aaaaaaaan6f3abztjx65brly5eh5v2tbc4tplhqabblg457zluwkkhfzt6pq
+    workers: ocid1.subnet.oc1.iad.aaaaaaaakwjtfpnsizjnbsygilbtzl2fngrpndzfba4ybofgqim3masy3mgq
+  oke:vcn: ocid1.vcn.oc1.iad.amaaaaaadoggtjaasym4jch6mdlvym3lm6upcm22mfger4ghqyabh2k6uefa

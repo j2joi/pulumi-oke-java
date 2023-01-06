@@ -1,4 +1,4 @@
-package myproject;
+package oke;
 
 import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
